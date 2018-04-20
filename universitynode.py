@@ -65,12 +65,6 @@ class UniversityNode(object):
             # 'contents_signature': SIGN(self.institution_name)
         })
         return self.last_block['index'] + 1 # ???
-    
-
-    def broadcast(block, hash):
-        # BROADCAST(block)
-        # self.current_student_records = []
-        # self.append_new_block(block)
 
 
     def append_new_block(self, block, reset=False):
