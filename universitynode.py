@@ -85,13 +85,13 @@ class UniversityNode(object):
         return current_block
 
 
-    def broadcast(self, block, block_hash):
-        for node in self.nodes:
-            block_package = {
-                'block': block,
-                'hash': block_hash
-            }
-            response = requests.post(f'http://{node}/chain', data=block_package)
+    # def broadcast(self, block, block_hash):
+    #     for node in self.nodes:
+    #         block_package = {
+    #             'block': block,
+    #             'hash': block_hash
+    #         }
+    #         response = requests.post(f'http://{node}/chain', data=block_package)
 
 
     def register_node(self, address):
@@ -162,7 +162,7 @@ class UniversityNode(object):
             return True
 
         return False
-        
+
 
     @property
     def last_block(self):
@@ -219,7 +219,7 @@ def mine():
     block_hash = UniversityNode.hash(valid_block)
     node.append_new_block(valid_block, reset=True)
 
-    node.broadcast(valid_block, block_hash)
+    # node.broadcast(valid_block, block_hash)
 
     response = {
         'message': "New Block Forged",
@@ -286,30 +286,29 @@ def consensus():
             'message': 'Our chain is authoritative',
             'chain': node.chain
         }
-
     return jsonify(response), 200
 
 
-@app.route('/nodes/accept_block', methods=['POST'])
-def accept():
-    values = request.get_json()
+# @app.route('/nodes/accept_block', methods=['POST'])
+# def accept():
+#     values = request.get_json()
 
-    required = ['block', 'hash']
-    if not all(k in values for k in required):
-        return 'Missing values', 400
+#     required = ['block', 'hash']
+#     if not all(k in values for k in required):
+#         return 'Missing values', 400
 
-    if not UniversityNode.valid_block_proof(values['block']):
-        return 'Not a valid block proof', 400
+#     if not UniversityNode.valid_block_proof(values['block']):
+#         return 'Not a valid block proof', 400
 
-    if values['hash'] != UniversityNode.hash(values['block']):
-        return 'Broadcasted hash does not match block\'s hash', 400
+#     if values['hash'] != UniversityNode.hash(values['block']):
+#         return 'Broadcasted hash does not match block\'s hash', 400
 
-    node.append_new_block(values['block'])
-    response = {
-        'message': 'New block appended',
-        'block': values['block']
-    }
-    return jsonify(response), 200
+#     node.append_new_block(values['block'])
+#     response = {
+#         'message': 'New block appended',
+#         'block': values['block']
+#     }
+#     return jsonify(response), 200
 
 
 if __name__ == '__main__':
