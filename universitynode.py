@@ -85,6 +85,15 @@ class UniversityNode(object):
         return current_block
 
 
+    def broadcast(self, block, block_hash):
+        for node in self.nodes:
+            block_package = {
+                'block': block,
+                'hash': block_hash
+            }
+            response = requests.post(f'http://{node}/chain', data=block_package)
+
+
     def register_node(self, address):
         """
         Add a new node to the list of nodes
@@ -153,16 +162,7 @@ class UniversityNode(object):
             return True
 
         return False
-
-
-    def broadcast(self, block, block_hash):
-        for node in self.nodes:
-            block_package = {
-                'block': block,
-                'hash': block_hash
-            }
-            response = requests.post(f'http://{node}/chain', data=block_package)
-
+        
 
     @property
     def last_block(self):
