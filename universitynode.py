@@ -7,7 +7,7 @@ import hashlib
 from textwrap import dedent
 from time import time
 from uuid import uuid4
-from flask import Flask
+from flask import Flask, jsonify, request
 
 
 # -- Constants -- #
@@ -41,7 +41,7 @@ class UniversityNode(object):
             'timestamp': time(),
             'student_records': self.current_student_records,
             'proof': proof,
-            'previous_hash': previous_hash or hash(self.chain[-1]),
+            'previous_hash': previous_hash or UniversityNode.hash(self.chain[-1]),
         }
         return block
 
@@ -58,7 +58,8 @@ class UniversityNode(object):
         }
         self.current_student_records.append({
             'contents': new_record_contents,
-            'contents_signature': SIGN(self.institution_name)
+            'contents_signature': self.institution_name
+            # 'contents_signature': SIGN(self.institution_name)
         })
         return self.last_block['index'] + 1 # ???
     
@@ -69,8 +70,10 @@ class UniversityNode(object):
         self.append_new_block(block)
 
 
-    def append_new_block(block):
+    def append_new_block(self, block, reset=False):
         self.chain.append(block)
+        if reset:
+            self.current_student_records = []
 
 
     def proof_of_work(self):
@@ -79,7 +82,7 @@ class UniversityNode(object):
         # Returns a valid block
         proof = 0
         current_block = self.get_current_block(proof)
-        while valid_block_proof(current_block) is False:
+        while UniversityNode.valid_block_proof(current_block) is False:
             proof += 1
             current_block = self.get_current_block(proof)
         return current_block
@@ -94,7 +97,7 @@ class UniversityNode(object):
     @staticmethod
     def valid_block_proof(block):
         # Check if the inputted block has valid proof
-        block_hash = hash(block)
+        block_hash = UniversityNode.hash(block)
         return block_hash[:4] == "0000"
 
 
@@ -137,10 +140,13 @@ node = UniversityNode(institution_properties)
 def mine():
     # We run the proof of work algorithm to get a valid block
     valid_block = node.proof_of_work()
+    block_hash = UniversityNode.hash(valid_block)
+    node.append_new_block(valid_block, reset=True)
 
     response = {
         'message': "New Block Forged",
         'block': valid_block,
+        'hash': block_hash,
     }
     return jsonify(response), 200
 
@@ -155,7 +161,7 @@ def new_record():
         return 'Missing values', 400
 
     # Create a new Transaction
-    index = node.add_new_record(self, values['first_name'], values['last_name'], values['id_number'], values['date_enrolled_through'])
+    index = node.add_new_record(values['first_name'], values['last_name'], values['id_number'], values['date_enrolled_through'])
 
     response = {'message': f'Transaction will be added to Block {index}'}
     return jsonify(response), 201
