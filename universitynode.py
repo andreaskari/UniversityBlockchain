@@ -4,10 +4,12 @@
 
 import json
 import hashlib
+import requests
 from textwrap import dedent
 from time import time
 from uuid import uuid4
 from flask import Flask, jsonify, request
+from urllib.parse import urlparse
 
 
 # -- Constants -- #
@@ -22,6 +24,7 @@ class UniversityNode(object):
         # Properties all blockchain nodes have
         self.chain = []
         self.current_student_records = []
+        self.nodes = set()
 
         # Private properties (for this node)
         self.institution_name = institution_properties['name']
@@ -64,10 +67,10 @@ class UniversityNode(object):
         return self.last_block['index'] + 1 # ???
     
 
-    def broadcast_our_block(block):
-        BROADCAST(block)
-        self.current_student_records = []
-        self.append_new_block(block)
+    def broadcast(block, hash):
+        # BROADCAST(block)
+        # self.current_student_records = []
+        # self.append_new_block(block)
 
 
     def append_new_block(self, block, reset=False):
@@ -86,6 +89,85 @@ class UniversityNode(object):
             proof += 1
             current_block = self.get_current_block(proof)
         return current_block
+
+
+    def register_node(self, address):
+        """
+        Add a new node to the list of nodes
+        :param address: <str> Address of node. Eg. 'http://192.168.0.5:5000'
+        :return: None
+        """
+        parsed_url = urlparse(address)
+        self.nodes.add(parsed_url.netloc)
+
+
+    def valid_chain(self, chain):
+        """
+        Determine if a given blockchain is valid
+        :param chain: <list> A blockchain
+        :return: <bool> True if valid, False if not
+        """
+        last_block = chain[0]
+        current_index = 1
+
+        while current_index < len(chain):
+            block = chain[current_index]
+            print(f'{last_block}')
+            print(f'{block}')
+            print("\n-----------\n")
+            # Check that the hash of the block is correct
+            if block['previous_hash'] != UniversityNode.hash(last_block):
+                return False
+
+            # Check that the Proof of Work is correct
+            if not UniversityNode.valid_block_proof(block):
+                return False
+
+            last_block = block
+            current_index += 1
+        return True
+
+
+    def resolve_conflicts(self): # how does this work with broadcasting
+        """
+        This is our Consensus Algorithm, it resolves conflicts
+        by replacing our chain with the longest one in the network.
+        :return: <bool> True if our chain was replaced, False if not
+        """
+        neighbours = self.nodes
+        new_chain = None
+
+        # We're only looking for chains longer than ours
+        max_length = len(self.chain)
+
+        # Grab and verify the chains from all the nodes in our network
+        for node in neighbours:
+            response = requests.get(f'http://{node}/chain')
+
+            if response.status_code == 200:
+                length = response.json()['length']
+                chain = response.json()['chain']
+
+                # Check if the length is longer and the chain is valid
+                if length > max_length and self.valid_chain(chain):
+                    max_length = length
+                    new_chain = chain
+
+        # Replace our chain if we discovered a new, valid chain longer than ours
+        if new_chain:
+            self.chain = new_chain
+            return True
+
+        return False
+
+
+    def broadcast(self, block, block_hash):
+        for node in self.nodes:
+            block_package = {
+                'block': block,
+                'hash': block_hash
+            }
+            response = requests.post(f'http://{node}/chain', data=block_package)
 
 
     @property
@@ -143,6 +225,8 @@ def mine():
     block_hash = UniversityNode.hash(valid_block)
     node.append_new_block(valid_block, reset=True)
 
+    node.broadcast(valid_block, block_hash)
+
     response = {
         'message': "New Block Forged",
         'block': valid_block,
@@ -172,6 +256,64 @@ def full_chain():
     response = {
         'chain': node.chain,
         'length': len(node.chain),
+    }
+    return jsonify(response), 200
+
+
+@app.route('/nodes/register', methods=['POST'])
+def register_nodes():
+    values = request.get_json()
+
+    nodes = values.get('nodes')
+    if nodes is None:
+        return "Error: Please supply a valid list of nodes", 400
+
+    for node in nodes:
+        node.register_node(node)
+
+    response = {
+        'message': 'New nodes have been added',
+        'total_nodes': list(node.nodes),
+    }
+    return jsonify(response), 201
+
+
+@app.route('/nodes/resolve', methods=['GET'])
+def consensus():
+    replaced = node.resolve_conflicts()
+
+    if replaced:
+        response = {
+            'message': 'Our chain was replaced',
+            'new_chain': node.chain
+        }
+    else:
+        response = {
+            'message': 'Our chain is authoritative',
+            'chain': node.chain
+        }
+
+    return jsonify(response), 200
+
+
+@app.route('/nodes/accept_block', methods=['POST'])
+def accept():
+    values = request.get_json()
+
+    required = ['block', 'hash']
+    if not all(k in values for k in required):
+        return 'Missing values', 400
+
+    if not UniversityNode.valid_block_proof(values['block']):
+        return 'Not a valid block proof', 400
+
+    if values['hash'] != UniversityNode.hash(values['block']):
+        return 'Broadcasted hash does not match block\'s hash', 400
+
+    node.append_new_block(values['block'])
+    response = {
+        'message': 'New block appended',
+        'block': values['block']
     }
     return jsonify(response), 200
 

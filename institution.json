@@ -1,5 +1,6 @@
 {
 	"name": "University of California, Berkeley",
 	"public_key": "a98so7yt45yuhgt67ujhgfr",
-	"private_key": "345tyhjiuytrerfgbjiuhjklpokm"
+	"private_key": "345tyhjiuytrerfgbjiuhjklpokm",
+	"port": 5000
 }
