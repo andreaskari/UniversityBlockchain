@@ -115,8 +115,8 @@ class UniversityNode(object):
 
         while current_index < len(chain):
             block = chain[current_index]
-            print(f'{last_block}')
-            print(f'{block}')
+            print('{last_block}')
+            print('{block}')
             print("\n-----------\n")
             # Check that the hash of the block is correct
             if block['previous_hash'] != UniversityNode.hash(last_block):
@@ -145,7 +145,7 @@ class UniversityNode(object):
 
         # Grab and verify the chains from all the nodes in our network
         for node in neighbours:
-            response = requests.get(f'http://{node}/chain')
+            response = requests.get('http://{node}/chain')
 
             if response.status_code == 200:
                 length = response.json()['length']
@@ -241,7 +241,7 @@ def new_record():
     # Create a new Transaction
     index = node.add_new_record(values['first_name'], values['last_name'], values['id_number'], values['date_enrolled_through'])
 
-    response = {'message': f'Transaction will be added to Block {index}'}
+    response = {'message': 'Transaction will be added to Block {index}'}
     return jsonify(response), 201
 
 
