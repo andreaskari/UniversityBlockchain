@@ -1,29 +1,120 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
- 
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>Hello World Template</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<title>Add Student</title>
+	<meta charset="UTF-8">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--===============================================================================================-->
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='images/icons/favicon.ico') }}">
+	<!-- <link rel="icon" type="image/png" href="./images/icons/favicon.ico"/> -->
+<!--===============================================================================================-->
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='vendor/bootstrap/css/bootstrap.min.css') }}">
+	<!-- <link rel="stylesheet" type="text/css" href="./vendor/bootstrap/css/bootstrap.min.css"> -->
+<!--===============================================================================================-->
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='fonts/font-awesome-4.7.0/css/font-awesome.min.css') }}">
+	<!-- <link rel="stylesheet" type="text/css" href="./fonts/font-awesome-4.7.0/css/font-awesome.min.css"> -->
+<!--===============================================================================================-->
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='fonts/iconic/css/material-design-iconic-font.min.css') }}">
+	<!-- <link rel="stylesheet" type="text/css" href="./fonts/iconic/css/material-design-iconic-font.min.css"> -->
+<!--===============================================================================================-->
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='vendor/animate/animate.css') }}">
+	<!-- <link rel="stylesheet" type="text/css" href="./vendor/animate/animate.css"> -->
+<!--===============================================================================================-->
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='vendor/css-hamburgers/hamburgers.min.css') }}">
+<!-- 	<link rel="stylesheet" type="text/css" href="./vendor/css-hamburgers/hamburgers.min.css"> -->
+<!--===============================================================================================-->
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='vendor/animsition/css/animsition.min.css') }}">
+<!-- 	<link rel="stylesheet" type="text/css" href="./vendor/animsition/css/animsition.min.css"> -->
+<!--===============================================================================================-->
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='vendor/select2/select2.min.css') }}">
+	<!-- <link rel="stylesheet" type="text/css" href="./vendor/select2/select2.min.css"> -->
+<!--===============================================================================================-->
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='vendor/daterangepicker/daterangepicker.css') }}">
+<!-- 	<link rel="stylesheet" type="text/css" href="./vendor/daterangepicker/daterangepicker.css"> -->
+<!--===============================================================================================-->
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/util.css') }}">
+	<!-- <link rel="stylesheet" type="text/css" href="./css/util.css"> -->
+	<!-- <link rel="stylesheet" type="text/css" href="./css/main.css"> -->
+	<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/main.css') }}">
+
+<!--===============================================================================================-->
 </head>
 <body>
-	<form>
-	  First name:<br>
-	  <input type="text" name="first_name" id="first_name"><br><br>
-	  Last name:<br>
-	  <input type="text" name="last_name" id="last_name"><br><br>
-	  Student ID:<br>
-	  <input type="text" name="student_id" id="student_id"><br><br>
-	  <br><br>
-	  <input type="button" id="submitBtn" value="Check">
-	  <input type="button" id="resolveBtn" value="Resolve">
-	  <h1 id="result"></h1>
-	  <h1 id="school"></h1>	
-	  <h1 id="signature"></h1>
-	</form>
-</body>
 
-<script type="text/javascript">
+
+	<div class="container-contact100">
+		<div class="wrap-contact100">
+			<form class="contact100-form validate-form">
+				<span class="contact100-form-title">
+					New Student
+				</span>
+
+				<label class="label-input100" for="first-name">Student Name *</label>
+				<div class="wrap-input100 rs1 validate-input">
+					<input id="first_name" class="input100" type="text" name="first-name" placeholder="First name">
+					<span class="focus-input100"></span>
+				</div>
+				<div class="wrap-input100 rs1 validate-input">
+					<input id="last_name" class="input100" type="text" name="last-name" placeholder="Last name">
+					<span class="focus-input100"></span>
+				</div>
+
+				<label class="label-input100">Student ID</label>
+				<div class="wrap-input100 validate-input">
+					<input id="student_id" class="input100" type="text" name="email" placeholder="Eg. 185185185">
+					<span class="focus-input100"></span>
+				</div>
+
+				<div class="container-contact100-form-btn">
+					<input type="button" class="contact100-form-btn" id="submitBtn" value="Check Student">
+				</div>
+				<div class="container-contact100-form-btn">
+					<input type="button" class="contact50-form-btn" id="resolveBtn" value="Resolve">
+				</div>
+			</form>
+			<h1 id="result" class="label-input100"></h1>
+			<h1 id="school" class="label-input100"></h1>
+			<h3 id="signature" class="label-input100"></h1>
+		</div>
+	</div>
+
+
+
+<!--===============================================================================================-->
+<script href="{{ url_for('static', filename='vendor/jquery/jquery-3.2.1.min.js') }}"></script>
+	<!-- <script src="vendor/jquery/jquery-3.2.1.min.js"></script> -->
+<!--===============================================================================================-->
+<script href="{{ url_for('static', filename='vendor/animsition/js/animsition.min.js') }}"></script>
+	<!-- <script src="vendor/animsition/js/animsition.min.js"></script> -->
+<!--===============================================================================================-->
+<script href="{{ url_for('static', filename='vendor/bootstrap/js/popper.js') }}"></script>
+	<!-- <script src="vendor/bootstrap/js/popper.js"></script> -->
+	<script href="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+	<!-- <script src="vendor/bootstrap/js/bootstrap.min.js"></script> -->
+<!--===============================================================================================-->
+<script href="{{ url_for('static', filename='vendor/select2/select2.min.js') }}"></script>
+	<!-- <script src="vendor/select2/select2.min.js"></script> -->
+<!--===============================================================================================-->
+<script href="{{ url_for('static', filename='vendor/daterangepicker/moment.min.js') }}"></script>
+	<!-- <script src="vendor/daterangepicker/moment.min.js"></script> -->
+	<script href="{{ url_for('static', filename='vendor/daterangepicker/daterangepicker.js') }}"></script>
+	<!-- <script src="vendor/daterangepicker/daterangepicker.js"></script> -->
+<!--===============================================================================================-->
+<script href="{{ url_for('static', filename='vendor/countdowntime/countdowntime.js') }}"></script>
+<!-- 	<script src="vendor/countdowntime/countdowntime.js"></script> -->
+<!--===============================================================================================-->
+<script href="{{ url_for('static', filename='js/main.js') }}"></script>
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-23581568-13');
 
 $(function() {
 $('#submitBtn').click(function() {
@@ -45,6 +136,8 @@ $('#submitBtn').click(function() {
 	        	$("#signature").text('Block signature: ' + obj['signature']);
 	        } else {
 	        	$("#result").text('Could not confirm ' + values['first_name'] + " is a student.");
+	        	$("#school").text("");
+	        	$("#signature").text("");
 	        }
 	    }
 	}
@@ -52,7 +145,6 @@ $('#submitBtn').click(function() {
 	$('#first_name').val('');
 	$('#last_name').val('');
 	$('#student_id').val('');
-	$('#date_enrolled_through').val('');
 	// xhttp.send("first_name=" + values["first_name"] + "&last_name=" + 
 	// 			values["last_name"] + "&student_id=" + values["student_id"]
 	// 			+ "&date_enrolled_through=" + values["date_enrolled_through"]);
@@ -69,4 +161,5 @@ $('#resolveBtn').click(function() {
 
 </script>
 
+</body>
 </html>

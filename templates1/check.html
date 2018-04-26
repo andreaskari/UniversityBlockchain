@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+ 
+<html>
+<head>
+<title>Hello World Template</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+	<form>
+	  First name:<br>
+	  <input type="text" name="first_name" id="first_name"><br><br>
+	  Last name:<br>
+	  <input type="text" name="last_name" id="last_name"><br><br>
+	  Student ID:<br>
+	  <input type="text" name="student_id" id="student_id"><br><br>
+	  <br><br>
+	  <input type="button" id="submitBtn" value="Check">
+	  <input type="button" id="resolveBtn" value="Resolve">
+	  <h1 id="result"></h1>
+	  <h1 id="school"></h1>	
+	  <h1 id="signature"></h1>
+	</form>
+</body>
+
+<script type="text/javascript">
+
+$(function() {
+$('#submitBtn').click(function() {
+	values = {
+		"first_name" : $("#first_name").val(),
+		"last_name" : $("#last_name").val(),
+		"student_id" : $("#student_id").val()
+	}
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("POST", "/verify", true);
+	xhttp.setRequestHeader("Content-type", "application/json");
+	xhttp.onreadystatechange = function() {//Call a function when the state changes.
+	    if(xhttp.status == 200) {
+	        // Request finished. Do processing here.
+	        var obj = JSON.parse(xhttp.responseText);
+	        if (obj['result']) {
+	        	$("#result").text('Confirmed ' + values['first_name'] + " is a student!");
+	        	$("#school").text('Student school: ' + obj['school']);
+	        	$("#signature").text('Block signature: ' + obj['signature']);
+	        } else {
+	        	$("#result").text('Could not confirm ' + values['first_name'] + " is a student.");
+	        	$("#school").text("");
+	        	$("#signature").text("");
+	        }
+	    }
+	}
+	xhttp.send(JSON.stringify(values));
+	$('#first_name').val('');
+	$('#last_name').val('');
+	$('#student_id').val('');
+	$('#date_enrolled_through').val('');
+	// xhttp.send("first_name=" + values["first_name"] + "&last_name=" + 
+	// 			values["last_name"] + "&student_id=" + values["student_id"]
+	// 			+ "&date_enrolled_through=" + values["date_enrolled_through"]);
+});
+});
+
+$(function() {
+$('#resolveBtn').click(function() {
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("GET", "/nodes/resolve", true);
+	xhttp.send();
+});
+});
+
+</script>
+
+</html>
