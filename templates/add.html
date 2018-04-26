@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+ 
+<html>
+<head>
+<title>Hello World Template</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+	<form>
+	  First name:<br>
+	  <input type="text" name="first_name" id="first_name"><br><br>
+	  Last name:<br>
+	  <input type="text" name="last_name" id="last_name"><br><br>
+	  Student ID:<br>
+	  <input type="text" name="student_id" id="student_id"><br><br>
+	  Date enrolled through:<br>
+	  <input type="text" name="date_enrolled_through" id="date_enrolled_through"><br><br>
+	  <input type="button" id="submitBtn" value="Add">
+	</form>
+	<br><br>
+	<input type="button" id="mineBtn" value="Mine">
+</body>
+
+<script type="text/javascript">
+
+$(function() {
+$('#submitBtn').click(function() {
+	values = {
+		"first_name" : $("#first_name").val(),
+		"last_name" : $("#last_name").val(),
+		"student_id" : $("#student_id").val(),
+		"date_enrolled_through" : $("#date_enrolled_through").val(),
+	}
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("POST", "/student/new", true);
+	xhttp.setRequestHeader("Content-type", "application/json");
+	xhttp.send(JSON.stringify(values));
+	$('#first_name').val('');
+	$('#last_name').val('');
+	$('#student_id').val('');
+	$('#date_enrolled_through').val('');
+	// xhttp.send("first_name=" + values["first_name"] + "&last_name=" + 
+	// 			values["last_name"] + "&student_id=" + values["student_id"]
+	// 			+ "&date_enrolled_through=" + values["date_enrolled_through"]);
+});
+});
+
+$(function() {
+$('#mineBtn').click(function() {
+	// values = {
+	// 	"first_name" : $("#first_name").val(),
+	// 	"last_name" : $("#last_name").val(),
+	// 	"student_id" : $("#student_id").val(),
+	// 	"date_enrolled_through" : $("#date_enrolled_through").val(),
+	// }
+	var xhttp = new XMLHttpRequest();
+	xhttp.open("GET", "/mine", true);
+	xhttp.send();
+	// xhttp.setRequestHeader("Content-type", "application/json");
+	// xhttp.send(JSON.stringify(values));
+	// $('#first_name').val('');
+	// $('#last_name').val('');
+	// $('#student_id').val('');
+	// $('#date_enrolled_through').val('');
+	// xhttp.send("first_name=" + values["first_name"] + "&last_name=" + 
+	// 			values["last_name"] + "&student_id=" + values["student_id"]
+	// 			+ "&date_enrolled_through=" + values["date_enrolled_through"]);
+});
+});
+
+</script>
+</html>

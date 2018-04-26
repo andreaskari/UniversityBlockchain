@@ -1,10 +1,14 @@
 {
-	"University of California, Berkeley": "MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgF+9IFwcJq0CxLi/1rkf3SjPNN3W
-qCSZClc4xsuXxgzaSfkkh9Bfftf/gOfuL4O7cmz5cgiOfwAa5OZa4R9S9uDW1zKA
-lNdcFq/S5nAxwNG+jYSI8Qhg/mlg8dA/c71LrkkZyktYlKwBVOOxaNdqzNoho89b
-P8ipUXpk9beNoYUJAgMBAAE=",
-	"University of California, Los Angeles": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDYxIgqV5CChW5h16ctZ5e7044u
+	"University of California, Berkeley": "-----BEGIN PUBLIC KEY-----
+MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgG2/mpyPvktFXyjW1005y6JLrLEK
+JpysMwcxQzyf5G2pTVjl8i2nhpTnuWZIyF8ekM/lB7H6Se6TjvdSxw9jevYdU9cP
+HHnjQx+ax2ekD2jC56NyBh/MGeq/yXqqygU50ptC28157ZqAutBq9/zHxX4QTNs0
+tb4+F92tudqFby6dAgMBAAE=
+-----END PUBLIC KEY-----",
+	"University of California, Los Angeles": "-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDYxIgqV5CChW5h16ctZ5e7044u
 Nh1+4FrjmPjsZq9ISwrUT3XV1XnVPmoVtROkKeuyFim4DJpNqJ3aaQeVa+ksor1v
 InDsUAxLTIuWKUY49OE0DJ6JOc/cpDjiduGISJbIFOCv4TKqoX+vBsEItkPzZ4rm
-TP4+A0qHkVhObe8JEQIDAQAB",
+TP4+A0qHkVhObe8JEQIDAQAB
+-----END PUBLIC KEY-----"
 }

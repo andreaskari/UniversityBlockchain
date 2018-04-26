@@ -5,13 +5,17 @@ from urllib.parse import urlparse
 from uuid import uuid4
 
 import requests
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
+from Crypto.PublicKey import RSA
+import crypto
+from threading import Thread
 
 INSTITUTION_INFO_FILE_PATH = './institution.json'
+PUBLIC_KEYS_FILE_PATH = './publickeys.json'
 
 
 class UniversityNode:
-    def __init__(self, institution_properties):
+    def __init__(self, institution_properties, keyfile):
         self.current_students = []
         self.chain = []
         self.nodes = set()
@@ -22,6 +26,9 @@ class UniversityNode:
         # self.institution_signature = SIGN(self.institution_name)
         self.institution_public_key = institution_properties['public_key']
         self.institution_private_key = institution_properties['private_key']
+        self.ciph = crypto.Crypto()
+        self.pubKey = RSA.importKey(self.institution_public_key)
+        self.privKey = RSA.importKey(self.institution_private_key)
 
         # Create the genesis block
         self.new_block(previous_hash='1', proof=100)
@@ -82,7 +89,7 @@ class UniversityNode:
 
         # We're only looking for chains longer than ours
         max_length = len(self.chain)
-
+        print(neighbours)
         # Grab and verify the chains from all the nodes in our network
         for node in neighbours:
             response = requests.get(f'http://{node}/chain')
@@ -90,11 +97,8 @@ class UniversityNode:
             if response.status_code == 200:
                 length = response.json()['length']
                 chain = response.json()['chain']
-                print(length)
-                print(max_length)
                 # Check if the length is longer and the chain is valid
                 if length > max_length and self.valid_chain(chain):
-                    print('here')
                     max_length = length
                     new_chain = chain
 
@@ -125,6 +129,7 @@ class UniversityNode:
         self.current_students = []
 
         self.chain.append(block)
+
         return block
 
     def new_transaction(self, sender, recipient, amount, date):
@@ -135,13 +140,23 @@ class UniversityNode:
         :param amount: Amount
         :return: The index of the Block that will hold this transaction
         """
-        self.current_students.append({
+        transaction = {
             'first_name': sender,
             'last_name': recipient,
             'student_id': amount,
             'date_enrolled_through': date,
             'institution_name': self.institution_name
-        })
+        }
+        sign_string = str(sender) + str(recipient) + str(amount) + str(date) + str(self.institution_name)
+        transaction['signature'] = self.ciph.asymmetric_sign(str(sign_string), self.privKey)
+        self.current_students.append(transaction)
+        # new_one = dict(transaction)
+        # sig = new_one['signature']
+        # new_one.pop('signature', None)
+        # print(new_one)
+        # print(transaction)
+        # verified = self.ciph.asymmetric_verify(str(new_one), sig, self.pubKey)
+        # print(verified)
         # MAKE SURE TO SIGN THE NEW TRANSACTION.
         # self.current_student_records.append({
         #     'contents': new_record_contents,
@@ -204,14 +219,11 @@ app = Flask(__name__)
 # Generate a globally unique address for this node
 node_identifier = str(uuid4()).replace('-', '')
 
-# Instantiate the Node
-with open(INSTITUTION_INFO_FILE_PATH) as data_file:    
-    institution_properties = json.load(data_file)
-node = UniversityNode(institution_properties)
-
+node = None
 
 @app.route('/mine', methods=['GET'])
 def mine():
+    global node
     # We run the proof of work algorithm to get the next proof...
     last_block = node.last_block
     proof = node.proof_of_work(last_block)
@@ -290,13 +302,52 @@ def consensus():
 
     return jsonify(response), 200
 
+@app.route('/verify', methods=['POST'])
+def verify_student():
+    values = request.get_json()
+
+    # Check that the required fields are in the POST'ed data
+    required = ['first_name', 'last_name', 'student_id']
+    if not all(k in values for k in required):
+        return 'Missing values', 400
+
+    for block in node.chain:
+        student_list = block['students']
+        for student in student_list:
+            if student['first_name'] == values['first_name'] and student['last_name'] == values['last_name'] and student['student_id'] == values['student_id']:
+                # check sig
+                new_one = dict(student)
+                sig = new_one['signature']
+                new_one.pop('signature', None)
+                with open(PUBLIC_KEYS_FILE_PATH) as pub_file:    
+                    pub_properties = json.load(pub_file, strict=False)
+                school_pub_key = RSA.importKey(pub_properties[student['institution_name']])
+                sign_string = str(student['first_name']) + str(student['last_name']) + str(student['student_id']) + str(student['date_enrolled_through']) + str(student['institution_name'])
+                verified = node.ciph.asymmetric_verify(str(sign_string), sig, school_pub_key)
+                if verified:
+                    print({"result" : True, "school" : student['institution_name'], "signature": sig})
+                    return jsonify({"result" : True, "school" : student['institution_name'], "signature": sig}), 200
+    print({"result" : False})
+    return jsonify({"result" : False}), 200
+
+@app.route('/add/')
+def add():
+    return render_template('add.html')
+
+@app.route('/check')
+def check():
+    return render_template('check.html')
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
 
     parser = ArgumentParser()
     parser.add_argument('-p', '--port', default=5000, type=int, help='port to listen on')
+    parser.add_argument('-i', '--institution', default="berkeley", type=str, help='your institution')
     args = parser.parse_args()
     port = args.port
-
+    INSTITUTION_INFO_FILE_PATH = './' + args.institution + '.json'
+    with open(INSTITUTION_INFO_FILE_PATH) as data_file:    
+        institution_properties = json.load(data_file, strict=False)
+    node = UniversityNode(institution_properties, args.institution)
     app.run(host='0.0.0.0', port=port)
